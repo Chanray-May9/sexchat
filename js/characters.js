@@ -171,8 +171,7 @@ const Characters = {
       : this.JAILBREAK_PREFIX + '\n\n' + char.prompt;
     prompt = prompt.replace(/<USER>/g, user.name);
     prompt = prompt.replace(/<USER_NAME>/g, user.name);
-    prompt += `\n\n当前与<USER_NAME>对话中。<USER_NAME>的设定：${user.desc}，${user.age || '?'}岁${user.gender || '男'}，角色定位：${user.role || '支配者'}。`;
-    prompt = prompt.replace(/<USER_NAME>/g, user.name);
+    prompt += `\n\n【重要身份说明】你扮演的是角色本身。正在和你对话的人是${user.name}，${user.age || '?'}岁${user.gender || '男'}，${user.desc}。${user.name}是你的${user.role || '对话对象'}。你不是${user.name}，你是角色。`;
     return prompt;
   },
 

@@ -3,7 +3,7 @@
 const API = {
   // DeepSeek V4 Pro API 配置
   BASE_URL: 'https://api.deepseek.com/chat/completions',
-  API_KEY: 'sk-d59b192b176e4f39a15f1ad3b4f6fd86',
+  API_KEY: 'sk-d594b4ef2b9a447fa1c2bb4f9fe4fd86',
   MODEL: 'deepseek-v4-pro',
 
   /**

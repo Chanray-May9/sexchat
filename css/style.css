@@ -611,12 +611,12 @@ body {
 
 /* ----- Reasoning Block (思考过程) ----- */
 .reasoning-block {
-  align-self: stretch;
-  margin: 0 0 4px 0;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 4px 0;
   border-radius: var(--radius-md);
   background: oklch(0.97 0.02 260);
   border: 2px solid oklch(0.82 0.06 260);
-  overflow: hidden;
   animation: msgIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 

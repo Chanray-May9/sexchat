@@ -95,6 +95,58 @@ const UI = {
       });
 
       list.appendChild(card);
+
+      // 该角色的历史记录（折叠）
+      const charHistory = Storage.getHistory().filter(h => h.charId === char.id);
+      if (charHistory.length > 0) {
+        const toggle = document.createElement('div');
+        toggle.className = 'char-history-toggle';
+        toggle.innerHTML = `<span class="toggle-arrow">▸</span> 历史记录 (${charHistory.length})`;
+
+        const histList = document.createElement('div');
+        histList.className = 'char-history-list';
+        histList.innerHTML = charHistory.map(h => `
+          <div class="char-history-item" data-hist-id="${h.id}">
+            <span class="hist-preview">${this.escape(h.preview || '(空)')}</span>
+            <span class="hist-date">${new Date(h.createdAt).toLocaleDateString('zh-CN')}</span>
+            <button class="btn-hist-del" data-del-id="${h.id}">✕</button>
+          </div>
+        `).join('');
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggle.classList.toggle('expanded');
+          histList.classList.toggle('open');
+        });
+
+        // 点击历史条目加载对话
+        histList.querySelectorAll('.char-history-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (e.target.closest('.btn-hist-del')) return;
+            const histId = item.dataset.histId;
+            const entry = charHistory.find(h => h.id === histId);
+            if (!entry) return;
+            // 恢复历史消息到聊天
+            Chat.currentCharId = char.id;
+            Storage.saveChat(char.id, entry.messages);
+            this.loadChatView(char);
+            if (window.innerWidth <= 768) this.els.sidebar.classList.add('collapsed');
+          });
+        });
+
+        // 删除按钮
+        histList.querySelectorAll('.btn-hist-del').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            Storage.deleteHistoryEntry(btn.dataset.delId);
+            this.renderCharList();
+          });
+        });
+
+        list.appendChild(toggle);
+        list.appendChild(histList);
+      }
     }
   },
 

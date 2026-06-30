@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
 </head>
 <body>
@@ -70,11 +70,6 @@
         </div>
       </div>
     </div>
-
-    <!-- History Button -->
-    <button class="btn-history" id="btnHistory">
-      <span class="btn-icon">📜</span> 历史记录
-    </button>
 
     <!-- Create Character Button -->
     <button class="btn-create-char" id="btnCreateChar">
@@ -241,29 +236,14 @@
     </div>
   </div>
 
-  <!-- History Modal -->
-  <div class="modal-overlay" id="historyOverlay" style="display:none">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>📜 历史记录</h3>
-        <button class="btn-close" id="btnCloseHistory">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="modal-body" id="historyList">
-        <div class="history-empty">暂无历史记录</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast -->
   <div class="toast" id="toast" style="display:none"></div>
 
-  <script src="js/storage.js"></script>
-  <script src="js/characters.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/chat.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/storage.js?v=3"></script>
+  <script src="js/characters.js?v=3"></script>
+  <script src="js/api.js?v=3"></script>
+  <script src="js/chat.js?v=3"></script>
+  <script src="js/ui.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

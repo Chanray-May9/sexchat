@@ -29,7 +29,7 @@ const API = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': \Bearer \\
+          'Authorization': 'Bearer ' + this.API_KEY
         },
         body: JSON.stringify(body),
         signal: controller.signal
@@ -40,9 +40,9 @@ const API = {
         let errMsg;
         try {
           const errJson = JSON.parse(errText);
-          errMsg = errJson.error?.message || \HTTP \\;
-        } catch {
-          errMsg = \HTTP \: \\;
+          errMsg = errJson.error ? errJson.error.message : 'HTTP ' + response.status;
+        } catch (e) {
+          errMsg = 'HTTP ' + response.status + ': ' + errText.slice(0, 200);
         }
         throw new Error(errMsg);
       }
@@ -67,16 +67,16 @@ const API = {
 
           try {
             const json = JSON.parse(data);
-            const delta = json.choices?.[0]?.delta;
+            const delta = json.choices && json.choices[0] ? json.choices[0].delta : null;
             if (!delta) continue;
             if (delta.reasoning_content) callbacks.onReasoning(delta.reasoning_content);
             if (delta.content) callbacks.onChunk(delta.content);
-          } catch {}
+          } catch (e) {}
         }
       }
     } catch (err) {
       if (err.name === 'AbortError') { callbacks.onDone(); }
-      else { callbacks.onError(err.message || '未知错误'); }
+      else { callbacks.onError(err.message || '???'); }
     }
     return controller;
   }

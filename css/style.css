@@ -611,9 +611,8 @@ body {
 
 /* ----- Reasoning Block (思考过程) ----- */
 .reasoning-block {
-  align-self: flex-start;
-  max-width: 85%;
-  margin: 0 0 4px 40px;
+  align-self: stretch;
+  margin: 0 0 4px 0;
   border-radius: var(--radius-md);
   background: oklch(0.97 0.02 260);
   border: 2px solid oklch(0.82 0.06 260);

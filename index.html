@@ -11,14 +11,13 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
 </head>
 <body>
-  <!-- Sidebar Backdrop (mobile only) -->
-  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h1 class="logo">性爱<span class="logo-accent">AI</span></h1>
-      <button class="sidebar-close" id="sidebarClose" aria-label="关闭">✕</button>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="收起侧边栏">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
     </div>
 
     <!-- User Identity -->
@@ -50,8 +49,7 @@
     <div class="welcome-screen" id="welcomeScreen">
       <div class="welcome-heart">💕</div>
       <h2>选一个角色开始吧</h2>
-      <p>挑个喜欢的，或者自己捏一个</p>
-      <button class="btn-open-characters" id="btnOpenChars">💕 打开角色列表</button>
+      <p>从左边挑个喜欢的，或者自己捏一个</p>
     </div>
 
     <!-- Chat Header -->
@@ -107,22 +105,6 @@
       <div class="input-hint">Enter 发送 · Shift+Enter 换行</div>
     </div>
   </main>
-
-  <!-- Mobile Bottom Bar -->
-  <nav class="mobile-bar" id="mobileBar">
-    <button class="mobile-bar-tab active" id="tabCharacters">
-      <span class="tab-icon">💕</span>
-      角色
-    </button>
-    <button class="mobile-bar-tab" id="tabClear">
-      <span class="tab-icon">🗑️</span>
-      清空
-    </button>
-    <button class="mobile-bar-tab" id="tabUser">
-      <span class="tab-icon">👤</span>
-      我的
-    </button>
-  </nav>
 
   <!-- Character Modal -->
   <div class="modal-overlay" id="modalOverlay" style="display:none">

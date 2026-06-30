@@ -49,11 +49,18 @@
         <div class="settings-row">
           <span class="settings-label">模型</span>
           <div class="settings-options">
-            <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-pro" checked onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display=''; UI.showToast('V4 Pro ✨')"><span>Pro</span></label>
-            <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-flash" onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display='none'; UI.showToast('Flash ⚡')"><span>Flash</span></label>
+            <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-pro" checked onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display=''; document.getElementById('thinkingRow').style.display=''; UI.showToast('V4 Pro ✨')"><span>Pro</span></label>
+            <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-flash" onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display='none'; document.getElementById('thinkingRow').style.display=''; UI.showToast('Flash ⚡')"><span>Flash</span></label>
           </div>
         </div>
-        <div class="settings-row" id="effortRow">
+        <div class="settings-row" id="thinkingRow">
+          <span class="settings-label">思考</span>
+          <div class="settings-options">
+            <label class="radio-chip"><input type="radio" name="settingThinking" value="off" checked onchange="UI.updateSetting('thinkingEnabled', false); document.getElementById('effortRow').style.display='none'"><span>关</span></label>
+            <label class="radio-chip"><input type="radio" name="settingThinking" value="on" onchange="UI.updateSetting('thinkingEnabled', true); document.getElementById('effortRow').style.display=''"><span>开</span></label>
+          </div>
+        </div>
+        <div class="settings-row" id="effortRow" style="display:none">
           <span class="settings-label">深度</span>
           <div class="settings-options">
             <label class="radio-chip"><input type="radio" name="settingEffort" value="low" onchange="UI.updateSetting('reasoningEffort', this.value)"><span>低</span></label>

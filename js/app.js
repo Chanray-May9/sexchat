@@ -11,8 +11,12 @@
 
   // 加载设置到 UI
   UI.loadSettingsUI();
-  // 如果当前是 Flash 模型，隐藏思考强度
-  if (Storage.getSettings().model === 'deepseek-v4-flash') {
+  const settings = Storage.getSettings();
+  // 根据设置初始化思考开关和深度选项的显示
+  if (!settings.thinkingEnabled) {
+    document.getElementById('effortRow').style.display = 'none';
+  }
+  if (settings.model === 'deepseek-v4-flash') {
     document.getElementById('effortRow').style.display = 'none';
   }
 

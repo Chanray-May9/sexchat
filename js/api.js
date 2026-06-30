@@ -19,13 +19,15 @@ const API = {
       messages: messages,
       stream: true,
       temperature: settings.temperature,
-      max_tokens: 8192,
-      thinking: { type: 'enabled' }
+      max_tokens: 8192
     };
 
-    // 只有 V4 Pro 支持 reasoning_effort
-    if (settings.model !== 'deepseek-v4-flash') {
-      body.reasoning_effort = settings.reasoningEffort || 'medium';
+    // 用户可选择开启思考
+    if (settings.thinkingEnabled) {
+      body.thinking = { type: 'enabled' };
+      if (settings.model !== 'deepseek-v4-flash') {
+        body.reasoning_effort = settings.reasoningEffort || 'medium';
+      }
     }
 
     try {

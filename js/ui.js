@@ -365,6 +365,8 @@ const UI = {
     if (modelRadio) modelRadio.checked = true;
     const effortRadio = document.querySelector(`input[name="settingEffort"][value="${settings.reasoningEffort}"]`);
     if (effortRadio) effortRadio.checked = true;
+    const thinkingRadio = document.querySelector(`input[name="settingThinking"][value="${settings.thinkingEnabled ? 'on' : 'off'}"]`);
+    if (thinkingRadio) thinkingRadio.checked = true;
   },
 
   // 更新单个设置

@@ -103,7 +103,7 @@ const UI = {
     const char = Characters.getById(charId);
     if (!char) return;
 
-    Chat.init(charId);
+    Chat.init(charId, char.name, char.emoji);
     this.renderCharList();
     this.loadChatView(char);
 

@@ -4,6 +4,7 @@ const Storage = {
   KEYS: {
     CHARACTERS: 'sexchat_characters',
     CHATS: 'sexchat_chats',
+    HISTORY: 'sexchat_history',
     ACTIVE_CHAR: 'sexchat_activeChar',
     SETTINGS: 'sexchat_settings',
     USER: 'sexchat_user'
@@ -102,6 +103,35 @@ const Storage = {
     const chats = this.getAllChats();
     delete chats[charId];
     localStorage.setItem(this.KEYS.CHATS, JSON.stringify(chats));
+  },
+
+  // --- History (Archive) ---
+  archiveChat(charId, messages, charName, charEmoji) {
+    if (!messages.length) return;
+    const history = this.getHistory();
+    const entry = {
+      id: 'hist_' + Date.now(),
+      charId,
+      charName: charName || charId,
+      charEmoji: charEmoji || '💕',
+      messages: messages.slice(-20),
+      createdAt: Date.now(),
+      preview: messages[messages.length - 1]?.content?.slice(0, 50) || ''
+    };
+    history.unshift(entry);
+    if (history.length > 50) history.length = 50;
+    localStorage.setItem(this.KEYS.HISTORY, JSON.stringify(history));
+  },
+
+  getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(this.KEYS.HISTORY)) || [];
+    } catch { return []; }
+  },
+
+  deleteHistoryEntry(id) {
+    const history = this.getHistory().filter(h => h.id !== id);
+    localStorage.setItem(this.KEYS.HISTORY, JSON.stringify(history));
   },
 
   // --- Active Character ---

@@ -23,19 +23,7 @@
   // 渲染角色列表
   UI.renderCharList();
 
-  // 恢复上次活跃角色
-  const savedCharId = Storage.getActiveChar();
-  if (savedCharId) {
-    const char = Characters.getById(savedCharId);
-    if (char) {
-      Chat.init(savedCharId);
-      UI.loadChatView(char);
-      // 移动端默认收起侧边栏
-      if (window.innerWidth <= 768) {
-        UI.els.sidebar.classList.add('collapsed');
-      }
-    }
-  }
+  // ⚠️ 不再自动恢复上次聊天 - 每次打开都是欢迎页，历史记录手动查看
 
   // ===== 事件绑定 =====
 
@@ -103,6 +91,72 @@
     UI.showToast('对话已导出 💕');
   });
 
+  // 历史记录按钮
+  document.getElementById('btnHistory').addEventListener('click', () => {
+    const overlay = document.getElementById('historyOverlay');
+    const list = document.getElementById('historyList');
+    const history = Storage.getHistory();
+
+    if (history.length === 0) {
+      list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    } else {
+      list.innerHTML = history.map(h => `
+        <div class="history-item" data-hist-id="${h.id}">
+          <span class="hist-emoji">${h.charEmoji}</span>
+          <div class="hist-info">
+            <div class="hist-name">${UI.escape(h.charName)}</div>
+            <div class="hist-preview">${UI.escape(h.preview)}</div>
+          </div>
+          <span class="hist-time">${new Date(h.createdAt).toLocaleDateString('zh-CN')}</span>
+          <button class="btn-hist-delete" data-del-id="${h.id}">🗑</button>
+        </div>
+      `).join('');
+
+      // 点击加载历史
+      list.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-hist-delete')) return;
+          const histId = item.dataset.histId;
+          const entry = history.find(h => h.id === histId);
+          if (!entry) return;
+          // 加载历史消息
+          const char = Characters.getById(entry.charId);
+          if (!char) return;
+          Chat.currentCharId = entry.charId;
+          Storage.setActiveChar(entry.charId);
+          // 把历史消息恢复到当前聊天
+          Storage.saveChat(entry.charId, entry.messages);
+          UI.loadChatView(char);
+          overlay.style.display = 'none';
+          if (window.innerWidth <= 768) UI.els.sidebar.classList.add('collapsed');
+        });
+      });
+
+      // 删除按钮
+      list.querySelectorAll('.btn-hist-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.delId;
+          Storage.deleteHistoryEntry(id);
+          // 刷新列表
+          document.getElementById('btnHistory').click();
+        });
+      });
+    }
+
+    overlay.style.display = 'flex';
+  });
+
+  document.getElementById('btnCloseHistory').addEventListener('click', () => {
+    document.getElementById('historyOverlay').style.display = 'none';
+  });
+
+  document.getElementById('historyOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.style.display = 'none';
+    }
+  });
+
   // 创建角色按钮
   UI.els.btnCreateChar.addEventListener('click', () => {
     UI.openCharModal();
@@ -123,6 +177,9 @@
     if (e.key === 'Escape') {
       if (UI.els.modalOverlay.style.display === 'flex') UI.closeModal();
       if (UI.els.userModalOverlay.style.display === 'flex') UI.closeUserModal();
+      if (document.getElementById('historyOverlay').style.display === 'flex') {
+        document.getElementById('historyOverlay').style.display = 'none';
+      }
     }
     // Ctrl+Enter 保存角色
     if (e.ctrlKey && e.key === 'Enter') {

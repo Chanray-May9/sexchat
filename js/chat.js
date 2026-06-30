@@ -6,7 +6,12 @@ const Chat = {
   isGenerating: false,
   reasoningEl: null,  // 当前思考气泡 DOM
 
-  init(charId) {
+  init(charId, charName, charEmoji) {
+    const oldChat = Storage.getChat(charId);
+    if (oldChat.length > 0) {
+      Storage.archiveChat(charId, oldChat, charName, charEmoji);
+      Storage.clearChat(charId);
+    }
     this.currentCharId = charId;
     Storage.setActiveChar(charId);
     this.isGenerating = false;

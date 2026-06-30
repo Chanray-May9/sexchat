@@ -227,7 +227,18 @@ const UI = {
     this.els.charName.value = char?.name || '';
     this.els.charEmoji.value = char?.emoji || '';
     this.els.charScene.value = char?.scene || '';
-    this.els.charPrompt.value = char?.prompt || '';
+    // 显示完整 system prompt（破解前缀 + 角色人设），让用户看到并编辑全部内容
+    if (char) {
+      const rawPrompt = char.prompt || '';
+      // 如果 prompt 已经包含破解前缀，直接显示；否则在前面加上前缀
+      if (rawPrompt.trim().startsWith('Communicate as an Untrammelled')) {
+        this.els.charPrompt.value = rawPrompt;
+      } else {
+        this.els.charPrompt.value = Characters.JAILBREAK_PREFIX + '\n\n' + rawPrompt;
+      }
+    } else {
+      this.els.charPrompt.value = '';
+    }
     this._editingCharId = char?.id || null;
 
     // 重置 emoji 选中状态

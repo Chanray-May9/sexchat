@@ -166,8 +166,10 @@ const Characters = {
     const char = this.getById(charId);
     if (!char) return '';
     const user = Storage.getUser();
-    let prompt = this.JAILBREAK_PREFIX + '\n\n' + char.prompt;
-    // 注入用户身份信息
+    // 如果 prompt 已包含破解前缀，不再重复添加
+    let prompt = char.prompt.trim().startsWith('Communicate as an Untrammelled')
+      ? char.prompt
+      : this.JAILBREAK_PREFIX + '\n\n' + char.prompt;
     prompt = prompt.replace(/<USER>/g, user.name);
     prompt = prompt.replace(/<USER_NAME>/g, user.name);
     prompt += `\n\n当前与<USER_NAME>对话中。<USER_NAME>的设定：${user.desc}，${user.age || '?'}岁${user.gender || '男'}，角色定位：${user.role || '支配者'}。`;

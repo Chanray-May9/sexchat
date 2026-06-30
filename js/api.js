@@ -22,6 +22,8 @@ const API = {
       if (settings.model !== 'deepseek-v4-flash') {
         body.reasoning_effort = settings.reasoningEffort || 'medium';
       }
+    } else {
+      body.thinking = { type: 'disabled' };
     }
 
     try {

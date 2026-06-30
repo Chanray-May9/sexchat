@@ -516,9 +516,9 @@ body {
 .message.assistant .msg-avatar { background: oklch(0.92 0.04 5); }
 
 .message .msg-bubble {
-  padding: 12px 16px;
-  border-radius: 18px;
-  font-size: 15px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 16px;
   line-height: 1.6;
   word-break: break-word;
   position: relative;
@@ -642,8 +642,8 @@ body {
 
 .reasoning-content {
   padding: 8px 12px 10px;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--text-muted);
   max-height: 300px;
   overflow-y: auto;

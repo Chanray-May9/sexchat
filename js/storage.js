@@ -36,8 +36,13 @@ const Storage = {
   addCharacter(char) {
     const chars = this.getCharacters();
     char.id = char.id || 'char_' + Date.now();
-    char.createdAt = Date.now();
-    chars.push(char);
+    const existingIdx = chars.findIndex(c => c.id === char.id);
+    if (existingIdx !== -1) {
+      chars[existingIdx] = { ...chars[existingIdx], ...char, updatedAt: Date.now() };
+    } else {
+      char.createdAt = Date.now();
+      chars.push(char);
+    }
     this.saveCharacters(chars);
     return char;
   },

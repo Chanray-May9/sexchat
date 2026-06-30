@@ -66,30 +66,29 @@ const UI = {
       const card = document.createElement('div');
       card.className = 'char-card' + (char.id === activeId ? ' active' : '') + (char.isPreset ? '' : ' custom');
       card.dataset.charId = char.id;
+      const presetBadge = char.isPreset ? '<span class="char-badge">预设</span>' : '';
       card.innerHTML = `
         <div class="char-avatar">${char.emoji || '💕'}</div>
         <div class="char-info">
-          <div class="char-name">${this.escape(char.name)}</div>
+          <div class="char-name">${this.escape(char.name)} ${presetBadge}</div>
           <div class="char-scene">${this.escape(char.scene)}</div>
         </div>
         <div class="char-actions">
-          ${!char.isPreset ? `<button class="btn-char-action edit" data-action="edit" title="编辑">✎</button>` : ''}
+          <button class="btn-char-action edit" data-action="edit" title="编辑">✎</button>
           ${!char.isPreset ? `<button class="btn-char-action" data-action="delete" title="删除">🗑</button>` : ''}
         </div>
       `;
 
       card.addEventListener('click', (e) => {
-        // 如果点击的是操作按钮，不触发角色切换
         if (e.target.closest('.btn-char-action')) return;
         this.selectCharacter(char.id);
       });
 
-      // 操作按钮事件
       card.querySelector('.btn-char-action.edit')?.addEventListener('click', (e) => {
         e.stopPropagation();
         this.openCharModal(char);
       });
-      card.querySelector('.btn-char-action:not(.edit)')?.addEventListener('click', (e) => {
+      card.querySelector('.btn-char-action[data-action="delete"]')?.addEventListener('click', (e) => {
         e.stopPropagation();
         this.deleteCharacter(char.id, char.name);
       });
@@ -209,13 +208,13 @@ const UI = {
       if (match) match.classList.add('selected');
     }
 
-    this.els.modalOverlay.style.display = 'flex';
+    // 由 app.js 覆写以使用 classList
   },
 
   // 关闭弹窗
   closeModal() {
-    this.els.modalOverlay.style.display = 'none';
     this._editingCharId = null;
+    // 由 app.js 覆写
   },
 
   // 保存角色
@@ -230,7 +229,13 @@ const UI = {
     if (!prompt) { this.showToast('请填写系统提示词', 'error'); return; }
 
     if (this._editingCharId) {
-      Storage.updateCharacter(this._editingCharId, { name, emoji, scene, prompt });
+      const existing = Characters.getById(this._editingCharId);
+      if (existing && existing.isPreset) {
+        // 预设角色编辑 → 保存到 localStorage 覆盖
+        Storage.addCharacter({ id: this._editingCharId, name, emoji, scene, prompt, isPreset: true });
+      } else {
+        Storage.updateCharacter(this._editingCharId, { name, emoji, scene, prompt });
+      }
       this.showToast('角色已更新 💕');
     } else {
       const newChar = Storage.addCharacter({ name, emoji, scene, prompt, isPreset: false });
@@ -267,11 +272,11 @@ const UI = {
     this.els.userGender.value = user.gender || '男';
     this.els.userRole.value = user.role || '';
     this.els.userDesc.value = user.desc || '';
-    this.els.userModalOverlay.style.display = 'flex';
+    // 由 app.js 覆写以使用 classList
   },
 
   closeUserModal() {
-    this.els.userModalOverlay.style.display = 'none';
+    // 由 app.js 覆写
   },
 
   saveUser() {

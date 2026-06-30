@@ -1,20 +1,32 @@
-// ===== api.js - DeepSeek API 调用 =====
+// ===== api.js - DeepSeek API 调用（支持思考流式）=====
 
 const API = {
-  // DeepSeek V4 Pro API 配置
   BASE_URL: 'https://api.deepseek.com/chat/completions',
-  API_KEY: 'sk-d594b4ef2b9a447fa1c2bb4f9fe4fd86',
-  MODEL: 'deepseek-v4-pro',
+  API_KEY: '***',
 
   /**
-   * 流式聊天
-   * @param {Array} messages - 消息数组 [{role, content}]
-   * @param {Object} callbacks - { onChunk(text), onDone(), onError(err) }
-   * @returns {AbortController} 用于取消请求
+   * 流式聊天（支持思考过程）
+   * @param {Array} messages - [{role, content}]
+   * @param {Object} callbacks - { onReasoning(text), onChunk(text), onDone(), onError(err) }
+   * @returns {AbortController}
    */
   async streamChat(messages, callbacks) {
     const controller = new AbortController();
     const settings = Storage.getSettings();
+
+    const body = {
+      model: settings.model || 'deepseek-v4-pro',
+      messages: messages,
+      stream: true,
+      temperature: settings.temperature,
+      max_tokens: 8192,
+      thinking: { type: 'enabled' }
+    };
+
+    // 只有 V4 Pro 支持 reasoning_effort
+    if (settings.model !== 'deepseek-v4-flash') {
+      body.reasoning_effort = settings.reasoningEffort || 'medium';
+    }
 
     try {
       const response = await fetch(this.BASE_URL, {
@@ -23,13 +35,7 @@ const API = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.API_KEY}`
         },
-        body: JSON.stringify({
-          model: this.MODEL,
-          messages: messages,
-          stream: true,
-          temperature: settings.temperature,
-          max_tokens: 4096
-        }),
+        body: JSON.stringify(body),
         signal: controller.signal
       });
 
@@ -72,18 +78,24 @@ const API = {
 
           try {
             const json = JSON.parse(data);
-            const content = json.choices?.[0]?.delta?.content;
-            if (content) {
-              callbacks.onChunk(content);
+            const delta = json.choices?.[0]?.delta;
+            if (!delta) continue;
+
+            // 思考过程（始终对用户可见）
+            if (delta.reasoning_content) {
+              callbacks.onReasoning(delta.reasoning_content);
             }
-          } catch (e) {
-            // Skip malformed chunks
-          }
+
+            // 正式输出
+            if (delta.content) {
+              callbacks.onChunk(delta.content);
+            }
+          } catch {}
         }
       }
     } catch (err) {
       if (err.name === 'AbortError') {
-        callbacks.onDone(); // treat abort as done
+        callbacks.onDone();
       } else {
         callbacks.onError(err.message || '未知错误');
       }

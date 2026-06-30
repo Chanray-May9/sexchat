@@ -10,6 +10,8 @@ const Storage = {
   },
 
   DEFAULT_SETTINGS: {
+    model: 'deepseek-v4-pro',
+    reasoningEffort: 'medium',
     temperature: 0.9,
     maxHistory: 50
   },

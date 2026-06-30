@@ -1,24 +1,22 @@
-// ===== chat.js - 聊天逻辑 =====
+// ===== chat.js - 聊天逻辑（支持思考过程可视化）=====
 
 const Chat = {
   currentCharId: null,
   abortController: null,
   isGenerating: false,
+  reasoningEl: null,  // 当前思考气泡 DOM
 
-  // 初始化聊天
   init(charId) {
     this.currentCharId = charId;
     Storage.setActiveChar(charId);
     this.isGenerating = false;
   },
 
-  // 获取当前聊天历史
   getHistory() {
     if (!this.currentCharId) return [];
     return Storage.getChat(this.currentCharId);
   },
 
-  // 发送消息
   async sendMessage(content) {
     if (!this.currentCharId || this.isGenerating) return;
 
@@ -26,8 +24,9 @@ const Chat = {
     if (!char) return;
 
     this.isGenerating = true;
+    this.reasoningEl = null;
 
-    // 添加用户消息到历史
+    // 保存用户消息
     const userMsg = { role: 'user', content, timestamp: Date.now() };
     Storage.addMessage(this.currentCharId, userMsg);
     UI.addMessage('user', content, userMsg.timestamp);
@@ -45,10 +44,20 @@ const Chat = {
     const msgEl = UI.addMessage('assistant', '', assistantTimestamp, true);
     const bubbleEl = msgEl.querySelector('.msg-bubble');
     let fullContent = '';
+    let hasReasoning = false;
 
-    // 流式请求
     this.abortController = await API.streamChat(apiMessages, {
+      onReasoning: (text) => {
+        hasReasoning = true;
+        this.reasoningEl = UI.addReasoning(text, this.reasoningEl);
+        UI.scrollToBottom();
+      },
       onChunk: (text) => {
+        // 思考结束后自动折叠思考块
+        if (hasReasoning && this.reasoningEl && !this.reasoningEl.dataset.collapsed) {
+          UI.collapseReasoning(this.reasoningEl);
+          this.reasoningEl = null;
+        }
         fullContent += text;
         if (bubbleEl) {
           bubbleEl.textContent = fullContent;
@@ -58,7 +67,6 @@ const Chat = {
       onDone: () => {
         this.isGenerating = false;
         this.abortController = null;
-        // 保存完整的 AI 回复到历史
         if (fullContent) {
           Storage.addMessage(this.currentCharId, {
             role: 'assistant',
@@ -76,7 +84,6 @@ const Chat = {
           bubbleEl.textContent = fullContent || `❌ 出错了：${err}`;
           bubbleEl.style.color = 'var(--accent)';
         }
-        // Still save partial content
         if (fullContent) {
           Storage.addMessage(this.currentCharId, {
             role: 'assistant',
@@ -90,7 +97,6 @@ const Chat = {
     });
   },
 
-  // 停止生成
   stopGeneration() {
     if (this.abortController) {
       this.abortController.abort();
@@ -100,7 +106,6 @@ const Chat = {
     }
   },
 
-  // 清空当前聊天
   clearCurrentChat() {
     if (this.currentCharId) {
       Storage.clearChat(this.currentCharId);
@@ -108,7 +113,6 @@ const Chat = {
     }
   },
 
-  // 导出当前聊天为文本
   exportCurrentChat() {
     if (!this.currentCharId) return '';
     const char = Characters.getById(this.currentCharId);
@@ -117,8 +121,7 @@ const Chat = {
 
     let text = `=== 性爱AI 聊天记录 ===\n`;
     text += `角色：${char.name}（${char.scene}）\n`;
-    text += `时间：${new Date().toLocaleString()}\n`;
-    text += `\n${'='.repeat(40)}\n\n`;
+    text += `时间：${new Date().toLocaleString()}\n\n`;
 
     for (const msg of history) {
       const label = msg.role === 'user' ? '你' : char.name;

@@ -9,6 +9,13 @@
   // 初始化用户身份显示
   UI.updateUserDisplay();
 
+  // 加载设置到 UI
+  UI.loadSettingsUI();
+  // 如果当前是 Flash 模型，隐藏思考强度
+  if (Storage.getSettings().model === 'deepseek-v4-flash') {
+    document.getElementById('effortRow').style.display = 'none';
+  }
+
   // 渲染角色列表
   UI.renderCharList();
 

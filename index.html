@@ -38,6 +38,26 @@
     </div>
 
     <!-- Create Character Button -->
+    <div class="sidebar-settings" id="sidebarSettings">
+      <div class="settings-title">⚙️ 模型设置</div>
+      <div class="settings-row">
+        <span class="settings-label">模型</span>
+        <div class="settings-options">
+          <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-pro" checked onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display=''; UI.showToast('已切换到 V4 Pro ✨')"><span>Pro</span></label>
+          <label class="radio-chip"><input type="radio" name="settingModel" value="deepseek-v4-flash" onchange="UI.updateSetting('model', this.value); document.getElementById('effortRow').style.display='none'; UI.showToast('已切换到 V4 Flash ⚡')"><span>Flash</span></label>
+        </div>
+      </div>
+      <div class="settings-row" id="effortRow">
+        <span class="settings-label">思考强度</span>
+        <div class="settings-options">
+          <label class="radio-chip"><input type="radio" name="settingEffort" value="low" onchange="UI.updateSetting('reasoningEffort', this.value)"><span>低</span></label>
+          <label class="radio-chip"><input type="radio" name="settingEffort" value="medium" checked onchange="UI.updateSetting('reasoningEffort', this.value)"><span>中</span></label>
+          <label class="radio-chip"><input type="radio" name="settingEffort" value="high" onchange="UI.updateSetting('reasoningEffort', this.value)"><span>高</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Character Button -->
     <button class="btn-create-char" id="btnCreateChar">
       <span class="btn-icon">＋</span> 创建角色
     </button>

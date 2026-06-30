@@ -186,10 +186,38 @@ const UI = {
   // 生成完成后的 UI 更新
   onGenerationDone() {
     this.hideTyping();
-    this.els.chatInput.focus();
-    // 更新输入框状态（保持可用）
     this.els.chatInput.disabled = false;
     this.els.btnSend.disabled = false;
+    // 不自动聚焦，避免键盘弹出
+  },
+
+  // ===== 思考过程显示 =====
+  addReasoning(text, existingEl) {
+    if (!existingEl) {
+      // 创建新的思考气泡
+      const div = document.createElement('div');
+      div.className = 'reasoning-block';
+      div.innerHTML = `
+        <div class="reasoning-header" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span class="reasoning-icon">🤔</span>
+          <span class="reasoning-label">思考中...</span>
+          <span class="reasoning-toggle">▼</span>
+        </div>
+        <div class="reasoning-content"></div>
+      `;
+      this.els.messages.appendChild(div);
+      existingEl = div;
+    }
+
+    const contentEl = existingEl.querySelector('.reasoning-content');
+    contentEl.textContent += text;
+    existingEl.querySelector('.reasoning-label').textContent = '思考中...';
+    return existingEl;
+  },
+
+  collapseReasoning(el) {
+    el.querySelector('.reasoning-label').textContent = '已深度思考';
+    el.classList.add('collapsed');
   },
 
   // 打开角色编辑弹窗
@@ -317,5 +345,21 @@ const UI = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  },
+
+  // 加载设置到 UI
+  loadSettingsUI() {
+    const settings = Storage.getSettings();
+    const modelRadio = document.querySelector(`input[name="settingModel"][value="${settings.model}"]`);
+    if (modelRadio) modelRadio.checked = true;
+    const effortRadio = document.querySelector(`input[name="settingEffort"][value="${settings.reasoningEffort}"]`);
+    if (effortRadio) effortRadio.checked = true;
+  },
+
+  // 更新单个设置
+  updateSetting(key, value) {
+    const settings = Storage.getSettings();
+    settings[key] = value;
+    Storage.saveSettings(settings);
   }
 };

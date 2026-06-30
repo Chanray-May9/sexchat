@@ -2,14 +2,9 @@
 
 const API = {
   BASE_URL: 'https://api.deepseek.com/chat/completions',
-  API_KEY: '***',
+  API_KEY: 'sk-d594b4ef2b9a447fa1c2bb4f9fe4fd86',
+  MODEL: 'deepseek-v4-pro',
 
-  /**
-   * 流式聊天（支持思考过程）
-   * @param {Array} messages - [{role, content}]
-   * @param {Object} callbacks - { onReasoning(text), onChunk(text), onDone(), onError(err) }
-   * @returns {AbortController}
-   */
   async streamChat(messages, callbacks) {
     const controller = new AbortController();
     const settings = Storage.getSettings();
@@ -22,7 +17,6 @@ const API = {
       max_tokens: 8192
     };
 
-    // 用户可选择开启思考
     if (settings.thinkingEnabled) {
       body.thinking = { type: 'enabled' };
       if (settings.model !== 'deepseek-v4-flash') {
@@ -35,7 +29,7 @@ const API = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.API_KEY}`
+          'Authorization': \Bearer \\
         },
         body: JSON.stringify(body),
         signal: controller.signal
@@ -46,9 +40,9 @@ const API = {
         let errMsg;
         try {
           const errJson = JSON.parse(errText);
-          errMsg = errJson.error?.message || `HTTP ${response.status}`;
+          errMsg = errJson.error?.message || \HTTP \\;
         } catch {
-          errMsg = `HTTP ${response.status}: ${errText.slice(0, 200)}`;
+          errMsg = \HTTP \: \\;
         }
         throw new Error(errMsg);
       }
@@ -59,10 +53,7 @@ const API = {
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) {
-          callbacks.onDone();
-          break;
-        }
+        if (done) { callbacks.onDone(); break; }
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
@@ -71,38 +62,22 @@ const API = {
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed || !trimmed.startsWith('data: ')) continue;
-
           const data = trimmed.slice(6);
-          if (data === '[DONE]') {
-            callbacks.onDone();
-            return controller;
-          }
+          if (data === '[DONE]') { callbacks.onDone(); return controller; }
 
           try {
             const json = JSON.parse(data);
             const delta = json.choices?.[0]?.delta;
             if (!delta) continue;
-
-            // 思考过程（始终对用户可见）
-            if (delta.reasoning_content) {
-              callbacks.onReasoning(delta.reasoning_content);
-            }
-
-            // 正式输出
-            if (delta.content) {
-              callbacks.onChunk(delta.content);
-            }
+            if (delta.reasoning_content) callbacks.onReasoning(delta.reasoning_content);
+            if (delta.content) callbacks.onChunk(delta.content);
           } catch {}
         }
       }
     } catch (err) {
-      if (err.name === 'AbortError') {
-        callbacks.onDone();
-      } else {
-        callbacks.onError(err.message || '未知错误');
-      }
+      if (err.name === 'AbortError') { callbacks.onDone(); }
+      else { callbacks.onError(err.message || '未知错误'); }
     }
-
     return controller;
   }
 };
